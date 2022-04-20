@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <map>
-// #define PRINT(x) #x << ": " << x
+
 
 class ListNode
 {
@@ -26,17 +26,18 @@ public:
 	ListNode* tail_;
 	int count_;
 
-	void serialize(std::ofstream& file) 
+	void serialize(std::ofstream& file)
 	{
 		std::map<ListNode*, int> listStructure;
 		ListNode* current = head_;
-		
-		for (int index = 0; current; current = current->next_, ++index) 
+
+		for (int index = 0; current; current = current->next_, ++index)
 		{
 			listStructure.insert({ current, index });
 		}
 
 		file << "{\n";
+		file << "\t\"count\": " << count_ << ",\n";
 		current = head_;
 		int index = 0;
 		while (current)
@@ -44,7 +45,6 @@ public:
 			const auto it = listStructure.find(current->rand_);
 			const int randElemIndex = it == listStructure.end() ? -1 : it->second;
 			file << getFormattedString(index, current->data_, randElemIndex);
-			// file << "\t\"" << index << "\":{\"data\":\"" << current->data_ << "\", \"randIndex\":" << randElemIndex << '}';
 			if (current->next_) file << ",\n";
 			current = current->next_;
 			++index;
@@ -53,12 +53,17 @@ public:
 	}
 
 	std::string getFormattedString(const int index, std::string data, const int randElemIndex) {
-		return std::string("\t\"" + std::to_string(index) + "\":{\"data\":\"" + data + "\", \"randIndex\":" + std::to_string(randElemIndex) + '}');
+		return std::string("\t\"" + std::to_string(index) + "\": {\"data\": \"" + data + "\", \"randIndex\": " + std::to_string(randElemIndex) + '}');
 	}
 
 	void deserialize(std::ifstream& file)
 	{
-
+		while (file) 
+		{
+			std::string strInput;
+			std::getline(file, strInput, ',');
+			std::cout << strInput << std::endl;
+		}
 	}
 
 	void add(ListNode* listNode)
@@ -80,7 +85,7 @@ public:
 
 	}
 
-	void fillRands() 
+	void fillRands()
 	{
 		for (ListNode* currentNode = head_; currentNode; currentNode = currentNode->next_)
 		{
@@ -116,7 +121,7 @@ public:
 		}
 	}
 
-	~ListRand() 
+	~ListRand()
 	{
 		ListNode* current = head_->next_;
 		while (current)
@@ -153,11 +158,12 @@ int main()
 
 	randomList->print();
 
-	std::ofstream outf("Serialized_list.txt");
+	std::ofstream outf("Serialized_list.json");
 	randomList->serialize(outf);
 
-	// std::ifstream inf("Serialized_list.txt");
-	// randomList->deserialize(inf);
+	std::ifstream inf("Serialized_list.txt");
+	randomList->deserialize(inf);
+	// file << "\t\"" << index << "\":{\"data\":\"" << current->data_ << "\", \"randIndex\":" << randElemIndex << '}';
 
 	delete randomList;
 

@@ -1,13 +1,14 @@
 {
-	"0":{"data":"first", "randIndex":5},
-	"1":{"data":"second", "randIndex":-1},
+	"count":11,
+	"0":{"data":"first", "randIndex":1},
+	"1":{"data":"second", "randIndex":10},
 	"2":{"data":"third", "randIndex":-1},
-	"3":{"data":"fourth", "randIndex":-1},
-	"4":{"data":"fifth", "randIndex":4},
-	"5":{"data":"sixth", "randIndex":6},
+	"3":{"data":"fourth", "randIndex":2},
+	"4":{"data":"fifth", "randIndex":-1},
+	"5":{"data":"sixth", "randIndex":-1},
 	"6":{"data":"seventh", "randIndex":5},
 	"7":{"data":"eighth", "randIndex":-1},
-	"8":{"data":"ninth", "randIndex":10},
+	"8":{"data":"ninth", "randIndex":7},
 	"9":{"data":"tenth", "randIndex":-1},
 	"10":{"data":"eleventh", "randIndex":-1}
 }
