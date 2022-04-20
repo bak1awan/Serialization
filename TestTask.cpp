@@ -5,7 +5,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <map>
-
+#include <sstream>
+#include <vector>
 
 class ListNode
 {
@@ -14,8 +15,14 @@ public:
 	ListNode* next_;
 	ListNode* rand_;
 	std::string data_;
-
-	ListNode(std::string data) : prev_{ nullptr }, next_{ nullptr }, rand_{ nullptr }, data_{ data } {}
+	ListNode(std::string data) : prev_{ nullptr }, next_{ nullptr }, rand_{ nullptr }, data_{ data }
+	{
+		// std::cout << "I was constructed!\n";
+	}
+	~ListNode()
+	{
+		// std::cout << "I was destroyed!\n";
+	}
 };
 
 class ListRand
@@ -31,38 +38,78 @@ public:
 		std::map<ListNode*, int> listStructure;
 		ListNode* current = head_;
 
+		// fill map with pointer and its index
 		for (int index = 0; current; current = current->next_, ++index)
 		{
 			listStructure.insert({ current, index });
 		}
 
-		file << "{\n";
-		file << "\t\"count\": " << count_ << ",\n";
 		current = head_;
 		int index = 0;
+
+		// store list size
+		file << count_ << '\n';
+
+		// foreach element in the list
 		while (current)
 		{
+			// find random pointer if it is exists
 			const auto it = listStructure.find(current->rand_);
+
+			// if it is exists, store its index as reference for later converting
 			const int randElemIndex = it == listStructure.end() ? -1 : it->second;
-			file << getFormattedString(index, current->data_, randElemIndex);
-			if (current->next_) file << ",\n";
+			// format output string for this template: index data randIndex
+			file << std::string(std::to_string(index) + ' ' + current->data_ + ' ' + std::to_string(randElemIndex));
+			// check for tail element
+			if (current->next_) file << '\n';
+			// iterate
 			current = current->next_;
 			++index;
 		}
-		file << "\n}";
-	}
-
-	std::string getFormattedString(const int index, std::string data, const int randElemIndex) {
-		return std::string("\t\"" + std::to_string(index) + "\": {\"data\": \"" + data + "\", \"randIndex\": " + std::to_string(randElemIndex) + '}');
 	}
 
 	void deserialize(std::ifstream& file)
 	{
-		while (file) 
+		// clear previous nodes
+		clear();
+
+		// read amount of elements
+		int count{};
+		file >> count;
+
+		// for random pointers indexes - index corresponds to the number of element, value - to the number of random element it is pointing
+		std::vector<int> randomElements(count, 0);
+
+		// map for matching the element and its number
+		std::map<int, ListNode*> listElements;
+
+		for (int i = 0; i < count; ++i)
 		{
-			std::string strInput;
-			std::getline(file, strInput, ',');
-			std::cout << strInput << std::endl;
+			int index{};
+			std::string data;
+			int randIndex{};
+
+			file >> index >> data >> randIndex;
+
+			randomElements[index] = randIndex;
+
+			add(new ListNode(data));
+			listElements.insert({ i, tail_ });
+		}
+
+		restoreRandomPointers(randomElements, listElements);
+	}
+
+	void restoreRandomPointers(std::vector<int>& randomElements, std::map<int, ListNode*>& listElements)
+	{
+		ListNode* current = head_;
+		for (int i = 0; i < count_; ++i)
+		{
+			if (randomElements[i] != -1)
+			{
+				current->rand_ = listElements[randomElements[i]];
+			}
+			current = current->next_;
 		}
 	}
 
@@ -107,9 +154,23 @@ public:
 		}
 	}
 
-	// for debugging
+	void clear()
+	{
+		count_ = 0;
+		ListNode* current = head_->next_;
+		while (current)
+		{
+			delete current->prev_;
+			current = current->next_;
+		}
+		delete tail_;
+		tail_ = nullptr;
+		head_ = nullptr;
+	}
+
 	void print()
 	{
+		std::cout << "\n===================== LIST CONTENT =====================\n";
 		ListNode* current = head_;
 		int counter = 0;
 		while (current)
@@ -123,13 +184,7 @@ public:
 
 	~ListRand()
 	{
-		ListNode* current = head_->next_;
-		while (current)
-		{
-			delete current->prev_;
-			current = current->next_;
-		}
-		delete tail_;
+		clear();
 	}
 };
 
@@ -158,14 +213,29 @@ int main()
 
 	randomList->print();
 
-	std::ofstream outf("Serialized_list.json");
+	std::ofstream outf("Serialized_list.txt");
+
+	if (!outf)
+	{
+		std::cerr << "Could not open file for writing!\n" << std::endl;
+		exit(1);
+	}
+
 	randomList->serialize(outf);
 
+	outf.close();
+
 	std::ifstream inf("Serialized_list.txt");
+	if (!inf)
+	{
+		std::cerr << "Could not open file for reading!\n" << std::endl;
+		exit(1);
+	}
+
+
 	randomList->deserialize(inf);
-	// file << "\t\"" << index << "\":{\"data\":\"" << current->data_ << "\", \"randIndex\":" << randElemIndex << '}';
+
+	randomList->print();
 
 	delete randomList;
-
-
 }
