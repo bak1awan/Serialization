@@ -1,8 +1,6 @@
 # List serialization/deserialization
 ## Description
 
-*This is my test assignment for the company!*
-
 This program written on C++ is designed to serialize/deserialize a list. 
 
 Sctructures of `ListNode` and `ListRand` are specified below:
