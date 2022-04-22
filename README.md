@@ -5,7 +5,7 @@
 
 This program written on C++ is designed to serialize/deserialize a list. 
 
-ListNode and List itself has this sctructure:
+Sctructures of 'ListNode' and 'ListRand' are specified below:
 
 	class ListNode
 	{
@@ -32,4 +32,4 @@ ListNode and List itself has this sctructure:
 	}
 
 
-Each element is serialized in the format: data/spacebar/pointerToListNodeRand. 
+Each element is serialized in the format: 'data/spacebar/pointerToListNodeRand'. 
