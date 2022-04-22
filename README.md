@@ -31,3 +31,5 @@ Sctructures of `ListNode` and `ListRand` are specified below:
 
 
 Each element is serialized in the format: `data/spacebar/pointerToListNodeRand`. 
+
+The functionallity is divided into header (`List.h`) and cpp files (`List.cpp`). You cant test the functionallity in the `SerializeAndDeserializeList.cpp` file.
